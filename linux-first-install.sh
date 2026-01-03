@@ -498,26 +498,74 @@ show_summary() {
 
 # Hauptprogramm
 main() {
+    # Argumente verarbeiten
+    case "${1:-}" in
+        --reset)
+            reset_progress
+            echo ""
+            print_success "Fortschritt wurde zurückgesetzt. Führe das Script erneut aus."
+            exit 0
+            ;;
+        --help|-h)
+            echo "Linux First Install Setup Script"
+            echo ""
+            echo "Verwendung: $0 [OPTION]"
+            echo ""
+            echo "Optionen:"
+            echo "  --reset    Setzt den gespeicherten Fortschritt zurück"
+            echo "  --help     Zeigt diese Hilfe an"
+            echo ""
+            exit 0
+            ;;
+    esac
+    
     show_banner
     check_root
     
-    echo ""
-    print_info "Dieses Script führt folgende Konfigurationen durch:"
-    echo "  • OS-Erkennung"
-    echo "  • System-Update und Upgrade"
-    echo "  • Hostname-Änderung"
-    echo "  • Zeitzone-Konfiguration"
-    echo "  • Swap-Einrichtung"
-    echo "  • Installation wichtiger Tools"
-    echo "  • Firewall-Konfiguration"
-    echo "  • SSH-Härtung"
-    echo "  • Automatische Updates"
-    echo ""
-    read -p "Möchtest du fortfahren? (j/n): " continue
-    
-    if [[ ! $continue =~ ^[Jj]$ ]]; then
-        print_info "Setup abgebrochen."
-        exit 0
+    # Prüfe ob vorheriger Fortschritt existiert
+    if load_progress; then
+        echo ""
+        print_warning "Es wurde ein vorheriger Setup-Fortschritt gefunden."
+        read -p "Möchtest du das Setup fortsetzen? (j/n): " resume
+        
+        if [[ ! $resume =~ ^[JjYy]$ ]]; then
+            read -p "Von vorne beginnen? (j/n): " restart
+            if [[ $restart =~ ^[JjYy]$ ]]; then
+                reset_progress
+                print_info "Starte Setup von Anfang an..."
+            else
+                print_info "Setup abgebrochen."
+                exit 0
+            fi
+        else
+            print_info "Setze Setup fort..."
+            # Konfiguration laden
+            if [ -f "$CONFIG_FILE" ]; then
+                source "$CONFIG_FILE"
+            fi
+        fi
+    else
+        echo ""
+        print_info "Dieses Script führt folgende Konfigurationen durch:"
+        echo "  • OS-Erkennung"
+        echo "  • System-Update und Upgrade"
+        echo "  • Hostname-Änderung"
+        echo "  • Zeitzone-Konfiguration"
+        echo "  • Swap-Einrichtung"
+        echo "  • Installation wichtiger Tools"
+        echo "  • Firewall-Konfiguration"
+        echo "  • SSH-Härtung"
+        echo "  • Automatische Updates"
+        echo ""
+        print_info "Das Setup kann jederzeit mit CTRL+C unterbrochen werden."
+        print_info "Bei erneutem Ausführen kannst du das Setup fortsetzen."
+        echo ""
+        read -p "Möchtest du fortfahren? (j/n): " continue
+        
+        if [[ ! $continue =~ ^[JjYy]$ ]]; then
+            print_info "Setup abgebrochen."
+            exit 0
+        fi
     fi
     
     echo ""
@@ -535,5 +583,4 @@ main() {
 }
 
 # Script starten
-main
-
+main "$@"
