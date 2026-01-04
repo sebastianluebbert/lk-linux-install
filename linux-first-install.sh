@@ -37,9 +37,9 @@ show_banner() {
     echo -e "${GREEN}"
     cat << "EOF"
 ╔═══════════════════════════════════════════════════════════╗
-║        LK-EDV Dienstleistungen                            ║
-║        Interaktives Linux Setup Script                    ║
-║        Schritt für Schritt Konfiguration                  ║
+║                                                           ║
+║        Interaktives Linux Setup Script                   ║
+║        Schritt für Schritt Konfiguration                 ║
 ║                                                           ║
 ╚═══════════════════════════════════════════════════════════╝
 EOF
@@ -55,6 +55,25 @@ check_root() {
     fi
 }
 
+# Ja/Nein Frage - VEREINFACHT
+ask_yes_no() {
+    local prompt="$1"
+    local answer
+    
+    while true; do
+        echo ""
+        echo -n "${prompt} (j/n): "
+        read answer
+        
+        if [ "$answer" = "j" ] || [ "$answer" = "J" ] || [ "$answer" = "y" ] || [ "$answer" = "Y" ]; then
+            return 0
+        elif [ "$answer" = "n" ] || [ "$answer" = "N" ]; then
+            return 1
+        else
+            warning "Bitte nur 'j' oder 'n' eingeben!"
+        fi
+    done
+}
 
 # Text-Eingabe - VEREINFACHT
 ask_input() {
