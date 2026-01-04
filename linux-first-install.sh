@@ -38,10 +38,15 @@ show_banner() {
     cat << "EOF"
 ╔═══════════════════════════════════════════════════════════╗
 ║                                                           ║
-║        Interaktives Linux Setup Script                   ║
-║        Schritt für Schritt Konfiguration                 ║
+║                 LK-EDV Dienstleistungen                   ║
+║             Interaktives Linux Setup Script               ║
 ║                                                           ║
 ╚═══════════════════════════════════════════════════════════╝
+
+Interaktives Linux Setup Script                   
+Schritt für Schritt Konfiguration
+
+------------------------------------------------------------
 EOF
     echo -e "${NC}"
 }
@@ -369,7 +374,7 @@ question_tools() {
         info "Installiere Tools..."
         
         case $PKG_MGR in
-            apt) $INSTALL_CMD curl wget git vim nano htop net-tools ufw fail2ban unzip ;;
+            apt) $INSTALL_CMD cockpit ufw fail2ban unzip ;;
             dnf) $INSTALL_CMD curl wget git vim nano htop net-tools firewalld fail2ban unzip ;;
             *) $INSTALL_CMD curl wget git vim nano htop unzip ;;
         esac
@@ -401,7 +406,7 @@ question_firewall() {
             ufw allow ssh >/dev/null 2>&1
             
             echo ""
-            if ask_yes_no "Webserver (Ports 80, 443)?"; then
+            if ask_yes_no "sollen die Webserverports geöffnet werden (80, 443)?"; then
                 ufw allow 80 >/dev/null 2>&1
                 ufw allow 443 >/dev/null 2>&1
                 success "Webserver-Ports geöffnet"
@@ -445,7 +450,7 @@ question_ssh() {
     cp /etc/ssh/sshd_config /etc/ssh/sshd_config.backup
     
     echo ""
-    if ask_yes_no "Root-Login deaktivieren? (EMPFOHLEN)"; then
+    if ask_yes_no "Root-Login deaktivieren? (EMPFOHLEN) (Achtung wenn kein anderer Benutzer vorhanden ist droht die Aussperrung!"; then
         sed -i 's/^#*PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config
         success "Root-Login deaktiviert"
     fi
